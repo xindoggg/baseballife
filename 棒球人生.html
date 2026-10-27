@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>棒球人生</title>
+<style>
+:root{--bg:#f4f1ea;--fg:#1d2a1f;--card:#fff;--ac:#2f7d4f;--mut:#6b7a6e;--bd:#d9d4c7;--fd:#7fb069;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a14;--fg:#e6efe8;--card:#1c2a20;--ac:#58b97c;--mut:#93a597;--bd:#2f4235;--fd:#2f5a3a}}
+:root[data-theme="dark"]{--bg:#121a14;--fg:#e6efe8;--card:#1c2a20;--ac:#58b97c;--mut:#93a597;--bd:#2f4235;--fd:#2f5a3a}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC",sans-serif}
+#m{max-width:520px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px;line-height:1.6}
+small{color:var(--mut)}h2{margin:4px 0 8px}
+button,input{font:inherit;border-radius:10px;border:1px solid var(--bd);padding:10px 12px;background:var(--card);color:var(--fg)}
+button{display:block;width:100%;margin:6px 0;text-align:left;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);text-align:center;font-weight:600}
+.g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;font-size:13px}
+.g i{display:block;height:5px;background:var(--bd);border-radius:3px;margin-top:2px}.g u{display:block;height:5px;background:var(--ac);border-radius:3px}
+#fd{position:relative;height:300px;border-radius:10px;background:var(--fd);overflow:hidden;touch-action:manipulation;user-select:none}
+#zn{position:absolute;left:35%;width:30%;top:74%;height:18%;border:2px dashed #fff8}
+#bl{position:absolute;display:none;background:#fff;border:1px solid #888;border-radius:50%;transform:translate(-50%,0);top:0;width:10px;height:10px}
+#bx{position:relative;width:240px;height:240px;margin:0 auto;background:var(--fd);border-radius:10px;touch-action:manipulation;user-select:none}
+#sz{position:absolute;left:16.25%;top:16.25%;width:67.5%;height:67.5%;border:2px dashed #fff9}
+#cu{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #c0392b;transform:translate(-50%,-50%)}
+#msg{text-align:center;min-height:48px;margin-top:8px;font-weight:600}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}.g2 button{margin:0}.sel{border:2px solid var(--ac)!important}#bx{width:100%!important;height:auto!important;aspect-ratio:480/340;margin:0!important;overflow:hidden;cursor:crosshair}#sz{left:43.75%!important;top:45.9%!important;width:12.5%!important;height:19.1%!important}#fd{height:auto!important;aspect-ratio:480/340;background:none!important}#ua{opacity:0}.kc #ua{opacity:1}#cv{image-rendering:pixelated}#tg,#ac{position:absolute;display:none;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}#tg{background:#fff;border:2px solid #333}#ac{background:#e74c3c}</style></head><body><div id="m"></div>
+<script>
+const $=s=>document.querySelector(s),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),cl=(v,a=0,b=100)=>Math.max(a,Math.min(b,Math.round(v))),c2=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=Math.random;
+let S,acts=[];const A=f=>{acts.push(f);return `onclick="acts[${acts.length-1}]()"`};
+const show=h=>{$('#m').innerHTML=h;scrollTo(0,0)};
+const PN={ff:'四縫線速球',ft:'二縫線速球',sk:'伸卡球',ct:'卡特球',sp:'指叉球',fs:'快速指叉球',cv:'曲球',sl:'滑球',sw:'橫掃球',ch:'變速球'};
+const N={...PN,pow:'打擊力量',con:'擊球能力',spd:'速度',fld:'守備',sta:'體能',ctl:'控球'};
+const PP={ff:[125,.35,0,0],ft:[123,.33,.4,.15],sk:[119,.3,.5,.5],ct:[118,.3,-.4,.2],sp:[112,.28,0,.9],fs:[118,.3,0,.6],cv:[98,.25,0,1],sl:[111,.28,-.7,.3],sw:[104,.25,-1,.1],ch:[106,.3,.4,.5]};
+const vel=(k,t)=>Math.round(PP[k][0]+PP[k][1]*t);
+const cost=v=>v<50?1:v<70?2:v<85?3:4;
+const LV=['二軍','一軍後援','一軍先發','聯盟明星'];
+function ovr(){if(S.role=='B')return(S.pow*1.3+S.con*1.5+S.spd*.8+S.fld*.8+S.sta*.6)/5;const o=S.keys.filter(k=>PP[k]&&k!='ff');return(S.ff*1.5+o.reduce((a,k)=>a+S[k],0)/o.length+S.ctl*1.5+S.sta*.8)/4.8}
+const pro=()=>S.age>=18&&!(S.path=='uni'&&S.age<22);
+const team=()=>S.age<18?'高中校隊':!pro()?'大學校隊':LV[S.lvl];
+const diff=()=>S.age<18?.3:!pro()?.45:.55+.1*S.lvl;
+const M={skl:()=>S.role=='B'?'con':'ctl',pow:()=>S.role=='B'?'pow':'ff',spd:()=>S.role=='B'?'spd':'sta',fld:()=>S.role=='B'?'fld':'ctl',sta:()=>'sta'};
+function injure(){if(rn()<.7){S.inj=1;return '小傷(休養約一個月,今年表現打折)'}S.out=R(1,2);return `大傷(將缺席 ${S.out} 個賽季)`}
+function fx(o){const t=[];for(const k in o){const v=o[k],s=v>0?'+':'';if(M[k]){const q=M[k]();S[q]=cl(S[q]+v);t.push(`${N[q]}${s}${v}`)}else if(k=='men'){S.pts+=v;t.push(`天賦點${s}${v}`)}else if(k=='fame'){S.fame=Math.max(0,S.fame+v);t.push(`名聲${s}${v}`)}else if(k=='money'){S.money+=v;t.push(`資產${s}${v}萬`)}else if(k=='inj'&&rn()<v)t.push(injure())}return t.join('、')}
+function hud(){return `<div class=card><b>${S.name}</b>・${S.role=='P'?'投手':'打者('+(S.hand=='L'?'左':'右')+')'}・${S.age}歲・${team()}<br><small>名聲 ${S.fame}・資產 ${S.money}萬・天賦點 ${S.pts}${S.inj?'・🩹傷':''}${S.role=='P'?`・最速 ${vel('ff',S.ff)}km/h`:''}</small><div class=g>${S.keys.map(k=>`<div>${N[k]} ${S[k]}<i><u style="width:${S[k]}%"></u></i></div>`).join('')}</div></div>`}
+
+function start(){show(`<div class=card><h2>⚾ 棒球人生</h2>從 15 歲高中新生打到退休。<br><br><input id=nm placeholder="你的名字" style="width:100%;box-sizing:border-box"></div><button class=p ${A(()=>hsel($('#nm').value))}>我要當打者</button><button class=p ${A(()=>newG('P'))}>我要當投手</button>`)}
+function pick(nm){show(`<div class=card><h2>選擇球種</h2>四縫線速球必備,再選 3~5 種(共 4~6 種)。<br>${Object.keys(PN).filter(k=>k!='ff').map(k=>`<label style="display:inline-block;width:48%"><input type=checkbox name=pk value=${k}> ${PN[k]}</label>`).join('')}</div><button class=p ${A(()=>{const c=[...document.querySelectorAll('[name=pk]:checked')].map(e=>e.value);if(c.length<3||c.length>5)return alert('請選 3~5 種');newG('P',nm,c)})}>確定</button>`)}
+function hsel(nm){nm=nm||'無名新人';show(`<div class=card><h2>選擇打擊姿勢</h2>左右打會影響你的站位。</div><button class=p ${A(()=>newG('B',nm,null,'R'))}>右打</button><button class=p ${A(()=>newG('B',nm,null,'L'))}>左打</button>`)}
+function newG(r,nm,pk,hd){nm=nm||$('#nm').value;pk=pk||Object.keys(PN).filter(k=>k!='ff').sort(()=>rn()-.5).slice(0,R(3,5));S={name:(nm||'').trim()||'無名新人',role:r,hand:hd||'R',age:15,path:'',lvl:0,fame:0,money:0,inj:0,out:0,pts:40,c:{hr:0,h:0,w:0,k:0},used:[],yrs:0};S.keys=r=='B'?['pow','con','spd','fld','sta']:['ff',...pk,'ctl','sta'];const bn=R(-5,12);S.keys.forEach(k=>S[k]=c2(R(15,50)+bn,5,70));S.pts=0;S.base=ovr();show(hud()+`<div class=card><h2>你的天賦</h2>這是你與生俱來的天賦。之後每年的成長點數,取決於你比賽的表現。</div><button class=p ${A(year)}>開始高中生活</button>`)}
+function alloc(done){const a={};S.keys.forEach(k=>a[k]=0);let left=S.pts;const draw=()=>{show(hud()+`<div class=card><h2>分配天賦點</h2>剩餘 <b>${left}</b> 點(上限 100;能力越高,每升 1 點花費越多)</div>`+S.keys.map(k=>`<div class=card style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="flex:1">${N[k]} ${S[k]+a[k]}${a[k]?` (+${a[k]})`:''} <small>每點 ${cost(S[k]+a[k])} 點數</small></span><button style="width:52px;text-align:center" ${A(()=>{if(a[k]>0){left+=cost(S[k]+a[k]-1);a[k]--;draw()}})}>−</button><button style="width:52px;text-align:center" ${A(()=>{const c=cost(S[k]+a[k]);if(left>=c&&S[k]+a[k]<100){left-=c;a[k]++;draw()}})}>＋</button></div>`).join('')+`<button class=p ${A(()=>{S.keys.forEach(k=>S[k]+=a[k]);S.pts=left;done()})}>完成</button>`)};draw()}
+
+function year(){if(S.age==18&&!S.path)return draft();if(S.age==22&&S.path=='uni'){S.lvl=ovr()>60?1:0;S.money+=300}if(S.out>0)return rehab();train()}
+function draft(){const sp=c2((S.base-30)/45+(ovr()-50)/250,.05,.9),go=t=>show(hud()+`<div class=card>${t}</div><button class=p ${A(year)}>繼續</button>`);
+ show(hud()+`<div class=card><h2>18 歲・人生岔路</h2>高中畢業了,你要往哪走?</div>
+<button ${A(()=>{S.path='pro';S.money+=200;S.fame+=ovr()>60?10:0;year()})}>參加職棒選秀:進二軍,賺錢磨練實戰</button>
+<button ${A(()=>{S.path='uni';S.pts+=6;year()})}>念大學球隊:4 年成長(+6 天賦點),22 歲再進職棒</button>
+<button ${A(()=>{S.path='pro';if(rn()<sp){S.lvl=1;S.fame+=15;S.money+=500;go('旅美挑戰成功!你帶著名氣回國,直接站上一軍。')}else{S.lvl=0;S.pts=Math.max(0,S.pts-3);go('旅美碰壁,灰頭土臉回到二軍。(成功率看你的天賦)')}})}>赴美挑戰(成功率約 ${Math.round(sp*100)}%)</button>`)}
+
+function train(){const m=S.inj?1:3;show(hud()+`<div class=card><h2>${S.age}歲・訓練重點</h2>選一項,該能力免費 +${m}。${S.inj?'<small>帶傷訓練效果較低。</small>':''}</div><div class=g2>${S.keys.map(k=>`<button ${A(()=>{const g=Math.max(1,Math.round(m*(S[k]>=85?.34:S[k]>=70?.5:1)));S[k]=cl(S[k]+g);ev(`${N[k]}+${g}`)})}>${N[k]}</button>`).join('')}<button ${A(()=>{S.inj=0;ev('傷勢痊癒、天賦點+2'+(S.pts+=2,''))})}>休息療養</button></div>`)}
+
+const EV=[
+['學長邀你晚上加練',[['答應',{sta:2,skl:2,inj:.25},'進步了,但身體吃不消。'],['婉拒',{men:2},'你相信自己的節奏。']]],
+['球探來看你的比賽',[['放膽表現',{men:2,fame:6,inj:.1},'敢衝的樣子被記下來了。'],['低調不理會',{skl:2},'專心練自己的東西。']]],
+['好友邀你翹掉練習',[['去玩',{men:3,skl:-1},'放鬆了,手感有點生。'],['繼續練',{skl:2},'孤單但踏實。']]],
+['教練要你大幅調整動作',[['全盤接受',{skl:4,pow:-1,inj:.15},'短期不適,長期看好。'],['堅持原本的',{men:2,fame:1},'你捍衛了自己的風格。']]],
+['媒體想專訪你',[['接受',{fame:7,men:-1},'曝光增加,壓力也來了。'],['婉拒',{men:2},'注意力留在球場。']]],
+['家人生病,需要你回去照顧',[['回家陪伴',{men:3,sta:-2,skl:-2},'失去訓練時間,得到更重要的。'],['留下拚前途',{skl:3,fame:2,men:-3},'你選擇棒球,心裡有愧疚。']]],
+['隊友重傷,你被推上先發',[['接下重任',{men:3,fame:4,inj:.2},'你撐住了。'],['讓資深的上',{men:1,fld:1},'你穩穩等機會。']]],
+['廠商邀你代言',[['接下',{money:300,fame:5,skl:-2},'名利到手,練習被擠壓。'],['拒絕',{skl:2,men:1},'守住專注。']],1],
+['新人挑戰你的位置',[['正面較量',{skl:2,men:-1,inj:.1},'你被逼出新的進步。'],['當他的前輩',{men:3,fame:2},'你贏得了尊重。']]],
+['季前集訓可去高海拔',[['去',{sta:3,inj:.12},'呼吸很辛苦,體能卻上去了。'],['留在原地',{skl:1,men:1},'穩穩地練。']]],
+['網路上有人狂酸你',[['公開回嗆',{fame:3,men:-2},'話題度有了,心也亂了。'],['關掉不看',{men:2},'你把雜音關在外面。']]],
+['受邀參加國家隊選拔',[['全力爭取',{fame:8,sta:-2,inj:.15},'賽事很硬,你學到很多。'],['婉拒養傷',{sta:2,men:1},'你把身體放第一。']],1],
+['冬季聯盟有海外出賽機會',[['出國磨練',{skl:3,sta:-1,money:-50},'見識到不同的野球。'],['待在家鄉',{men:2,fame:1},'你好好休息。']],1],
+['教練問你要不要嘗試新定位',[['接受挑戰',{fld:2,skl:1,fame:2,inj:.1},'你拓展了可能性。'],['維持現狀',{men:1},'你專注本業。']]],
+['你連續幾場表現不佳,陷入低潮',[['找人聊聊調整',{men:3},'你走出了低潮。'],['加倍苦練',{skl:2,sta:-2,inj:.2},'練得太狠,身體有些吃不消。']]],
+['營養師建議調整飲食與睡眠',[['認真照做',{sta:3,spd:1},'身體狀況明顯變好。'],['照舊',{men:1},'你覺得沒必要。']]],
+['球迷在街上認出你',[['停下來簽名合照',{fame:4,men:1},'球迷很開心。'],['趕時間先走',{fame:-1},'有點失禮。']]],
+['球團要跟你談新合約',[['要求加薪',{money:400,fame:-1},'談判成功,但氣氛有點僵。'],['簽長約求穩',{money:150,men:2},'你得到安心感。']],1],
+['有人私下找你「喬」比賽',[['嚴詞拒絕並通報',{men:3,fame:6},'你守住底線。'],['敷衍帶過',{men:-3,fame:-4,money:100},'心裡一直不踏實。']],1]];
+function ev(pre){if(S.role=='P'&&S.keys.filter(k=>PP[k]).length<6&&rn()<.06){const c=Object.keys(PN).filter(k=>!S.keys.includes(k)),k=c[R(0,c.length-1)],nx=t=>show(hud()+`<div class=card>${t}</div><button class=p ${A(game)}>年度比賽</button>`);return show(hud()+`<div class=card><small>訓練:${pre}</small><h2>難得的機會</h2>一位前輩願意教你「${PN[k]}」。新球種起始只有 20,要再花天賦點磨練。</div><button ${A(()=>{S.keys.splice(S.keys.indexOf('ctl'),0,k);S[k]=20;nx('你學會了'+PN[k]+'(起始 20)。')})}>跟他學</button><button ${A(()=>nx('你婉拒了,專心練現有的球種。'))}>婉拒</button>`)}const pool=EV.map((e,i)=>i).filter(i=>!S.used.includes(i)&&(!EV[i][2]||pro()));const i=pool.length?pool[R(0,pool.length-1)]:R(0,6);S.used.push(i);const e=EV[i];
+ show(hud()+`<div class=card><small>訓練:${pre}</small><h2>事件</h2>${e[0]}</div>`+e[1].map(o=>`<button ${A(()=>{const t=fx(o[1]);show(hud()+`<div class=card>${o[2]}<br><small>${t}</small></div><button class=p ${A(S.out>0?rehab:game)}>${S.out>0?'接受治療':'年度比賽'}</button>`)})}>${o[0]}</button>`).join(''))}
+function rehab(){S.out--;S.age++;S.yrs++;S.fame=Math.max(0,S.fame-3);ageP();if(pro())S.lvl=Math.max(0,S.lvl-1);let t='你整年都在復健,沒能上場。';if(S.out==0){S.inj=0;t+=' '+fx({sta:-R(1,3),spd:-R(0,2)})}
+ show(hud()+`<div class=card><h2>傷停</h2>${t}${S.out?`<br>還需 ${S.out} 個賽季。`:'<br>你準備好回歸了。'}</div><button class=p ${A(nxt)}>繼續</button>`)}
+function ageP(){if(S.age>=30)S.keys.forEach(k=>{S[k]=cl(S[k]-R(0,k=='sta'||k=='spd'||k=='ff'||k=='pow'?2:1)-(S.age>35?1:0))})}
+function nxt(){if(S.age>=40||(S.age>25&&ovr()<36))return show(hud()+`<div class=card>歲月與身體都在提醒你:是時候了。</div><button class=p ${A(end)}>宣布退休</button>`);alloc(year)}
+
+function game(){show(hud()+`<div class=card><h2>年度關鍵比賽</h2>${S.role=='P'?'先選球種,再點擊好球帶指定球的最終位置;控球差或疲勞時,球路可能偏軟、容易被打。先發投到被換下,後援投 1~2 局。':'投手會做出投球動作,球飛來時,到好球帶(打者胸口到膝蓋)的時機點擊揮棒;壞球忍住。越後面變化球越多。'}<small><br>對手強度 ${Math.round(diff()*100)}</small></div><button class=p ${A(()=>S.role=='P'?pit():bat())}>親自上場</button><button ${A(sim)}>快速模擬本場</button>`)}
+let G;const newG2=()=>G={inn:1,my:0,op:0,st:null},ST=()=>({b:[0,0,0],o:0,r:0});
+function adv(s,n){const nb=[0,0,0];for(let i=2;i>=0;i--)if(s.b[i]){if(i+n>=3)s.r++;else nb[i+n]=1}if(n==4)s.r++;else nb[n-1]=1;s.b=nb}
+function wk(s){const b=s.b;if(b[0]){if(b[1]){if(b[2])s.r++;b[2]=1}b[1]=1}b[0]=1}
+function out(s,k){s.o++;if(k||s.o>=3)return;if(s.b[0]&&rn()<.2){s.b[0]=0;s.o++;return}if(s.b[2]&&rn()<.25){s.b[2]=0;s.r++}}
+function apply(s,c){if('124'.includes(c))adv(s,+c);else if(c=='W')wk(s);else out(s,c=='K')}
+function apc(p){const r=rn();if(r<.08)return 'W';if(r<.08+p){const s=rn();return s<.68?'1':s<.92?'2':'4'}return rn()<.2?'K':'O'}
+function half(s,p){while(s.o<3)apply(s,apc(p));return s.r}
+const bs=s=>s?s.b.map((x,i)=>x?i+1:'').join('')||'無':'無';
+function sim(){const r=c2(.42+(ovr()/100-diff())*1.1+(rn()-.5)*.35,0,1),st=S.lvl>=2||!pro(),tw=r>.55?1:r<.35?-1:0,a=R(0,5);G=tw>0?{my:a+R(1,3),op:a}:tw<0?{my:a,op:a+R(1,3)}:{my:a,op:a};S.role=='B'?fin(r,{hr:r>.8?1:0,h:Math.round(r*2.5),pa:4,tw}):fin(r,{outs:Math.round(r*(st?18:5))+(st?3:1),k:Math.round(r*(st?8:2)),runs:Math.round((1-r)*(st?5:2)),pc:st?90:20,win:st&&tw>0,tw})}
+
+const BP=[[60,90],[104,52],[60,12],[16,52],[60,90]];
+function runs(b0,n){const d=$('#dm');d.style.display='block';d.innerHTML='<path d="M60 90L104 52L60 12L16 52Z" fill=none stroke=#fff stroke-width=2 />'+BP.slice(0,4).map(p=>`<rect x=${p[0]-6} y=${p[1]-6} width=12 height=12 fill=#fff />`).join('');
+ const L=[0];b0.forEach((x,i)=>{if(x)L.push(i+1)});L.forEach((st,j)=>{const e=Math.min(st+n,4),dot=document.createElementNS('http://www.w3.org/2000/svg','circle'),fr=[];dot.setAttribute('r',6);dot.setAttribute('fill',j?'#ffd54f':'#ef5350');d.appendChild(dot);for(let i=st;i<=e;i++)fr.push({transform:`translate(${BP[i][0]}px,${BP[i][1]}px)`});if(fr.length<2)fr.push(fr[0]);dot.animate(fr,{duration:Math.max(1,e-st)*450,fill:'forwards',easing:'linear'})})}
+function bat(){newG2();const d=diff(),to=d*90-5,ar=['ft','ct','sl','cv','ch','sp','sk','sw'].sort(()=>rn()-.5).slice(0,3),mu=S.inj==1?.88:1,maxPA=S.age<18?4:3+(S.lvl>1)+(S.lvl>2),slot=S.lvl>1?R(2,4):R(5,8),op=()=>c2(.24+(d-.5)*.12,.17,.34),my=()=>c2(.24+(ovr()/100-d)*.15,.15,.38);
+ let li=0,pa=0,sc=0,hr=0,h=0,fa=100,lg=[],B=0,K=0,st,sub=0,note='';const pw0=.02+S.con*mu*.0004;
+ show(`<div class=card id=sb>比賽開始</div><div class=card>${bscene()}<div id=msg>你的打序:第 ${slot} 棒</div><small id=lg></small></div>`);pxInit('b');const msg=t=>$('#msg').innerHTML=t,sb=()=>$('#sb').innerHTML=`<b>第${G.inn}局</b>・對手 ${G.op} : ${G.my} 我方・${G.st.o}出局・壘上${bs(G.st)}`;
+ function over(){document.onkeydown=null;fin(c2(sc/(Math.max(pa,1)*1.2),0,1),{hr,h,pa,tw:G.my>G.op?1:G.my<G.op?-1:0},note)}
+ function go(){while(G.st.o<3){if(!sub&&li%9==slot-1){B=K=0;sb();return pitch()}apply(G.st,apc(my()));li++}G.my+=G.st.r;if(G.inn>=9)return over();G.inn++;G.op+=half(ST(),op());G.st=ST();go()}
+ function pitch(){const pb=c2(.15+pa*.08+d*.25+(K==2?.2:0),0,.8),k=rn()<pb?ar[R(0,2)]:'ff',ball=rn()<(K==2?.42:B==3?.1:.3);let x,y;
+  if(ball){const s=(rn()<.5?-1:1)*(.85+rn()*.3),o=(rn()*2-1)*.8;rn()<.5?(x=s,y=o):(y=s,x=o)}else{x=(rn()*2-1)*.75;y=(rn()*2-1)*.75}
+  const v=vel(k,to);st={k,v,x,y,ball,dur:3000-14*v,t0:performance.now(),sw:0,dn:0,bx:PP[k][2]*(.5+to/100)*26,by:PP[k][3]*(.5+to/100)*20};$('#dm').style.display='none';msg(`${B}壞 ${K}好`);play('b','idle');play('p','pitch');setTimeout(()=>play('b','loadB'),250);setTimeout(()=>{st.go=1;st.t0=performance.now();tick()},500)}
+ function tick(){if(st.dn)return;const p=(performance.now()-st.t0)/st.dur,u=1-p**3,X=240+st.x/.75*35*p-st.bx*u,Y=104+(229+st.y/.75*42-104)*p-st.by*u;PXS.ball=[X/3,Y/3,p];if(p>=1.08)return fin1(p,0);requestAnimationFrame(tick)}
+ function sw(){if(!st||st.dn||st.sw||!st.go)return;st.sw=1;play('b','swingB');fin1((performance.now()-st.t0)/st.dur,1)}
+ function fin1(p,s){st.dn=1;PXS.ball=null;const e=Math.abs(p-.95),pw=pw0*(1-(1-fa/100)*.4),edge=Math.max(Math.abs(st.x),Math.abs(st.y)),q=e/pw+(!st.ball&&edge>.5?(edge-.5)*2.4:0);let m,end=0;const strike=()=>K++,foul=()=>{if(K<2)K++};
+  if(!s){if(st.ball){B++;m='壞球'}else{K++;m='好球(未揮)'}}
+  else if(p<.6){strike();m='揮太早,揮空'}
+  else if(st.ball){if(rn()<.25){foul();m='擦成界外'}else{strike();m='追打壞球,揮空'}}
+  else if(q<1){end=rn()<c2(.05+S.pow*mu/150,0,.8)?['💥 全壘打!!',3,'4']:['強勁二壘安打!',2,'2']}
+  else if(q<2){end=rn()<.45+S.con*.003?['安打!',1.5,'1']:['擊出滾地/飛球出局',0,'O']}
+  else if(q<3.2){foul();m='界外球'}else{strike();m='揮空'}
+  msg(`${PN[st.k]} ${st.v}km/h・${end?end[0]:m}`);
+  if(end)return endPA(end[0],end[1],end[2]);if(K>=3)return endPA('三振',0,'K');if(B>=4)return endPA('保送',.6,'W');setTimeout(pitch,850)}
+ function endPA(t,p,c){const r0=G.st.r,b0=G.st.b.slice();apply(G.st,c);if('124'.includes(c))runs(b0,+c);const rb=G.st.r-r0;pa++;li++;sc+=p+.5*rb;if('124'.includes(c))h++;if(c=='4')hr++;fa-=14-S.sta*.08;B=K=0;lg.push(`${G.inn}局:${t}${rb?`(打點${rb})`:''}`);let f='';
+  if(rn()<.35+S.fld/250){if(rn()<.8+S.fld*.002){if(rn()<S.fld/200){sc+=.4;f='・守備:美技!'}else f='・守備:穩穩處理'}else{sc-=.5;G.op++;f='・守備:失誤,對手多拿1分'}}
+  $('#lg').innerHTML=lg.join('<br>')+f;sb();if(pa>=maxPA||fa<30||(pa>=3&&!h&&rn()<.4)){sub=1;note=pa<maxPA?'教練把你換下場了。':''}setTimeout(go,1700+('124'.includes(c)?+c*450:0))}
+ $('#fd').onpointerdown=sw;document.onkeydown=e=>{if(e.code=='Space'){e.preventDefault();sw()}};G.op+=half(ST(),op());G.st=ST();setTimeout(go,600)}
+
+let cx;const PXS={fl:0,kc:0,mt:null,ball:null,fb:null,pa:null,ba:null,m:'p'};
+const O='#14142b',PIT={j:'#d8453a',p:'#eceff1',c:'#d8453a',sk:'#f0b48a',g:1},BATC={j:'#eceff1',p:'#cfd8dc',c:'#2c3e9e',sk:'#f0b48a'},UMP={j:'#3b4252',p:'#4b5563',c:'#111',sk:'#f0b48a'},CATC={j:'#a63a3a',p:'#8d3030',c:'#6b7b86',sk:'#f0b48a',g:1};
+const PS={set:{h:[0,-14],s:[0,-26],d:[1,-33],fk:[2,-7],ff:[3,0],bk:[-2,-7],bf:[-3,0],ae:[3,-22],ah:[6,-24],ge:[3,-22],gh:[7,-25]},
+lift:{h:[0,-14],s:[-1,-26],d:[0,-33],fk:[7,-18],ff:[4,-10],bk:[-1,-7],bf:[-2,0],ae:[-4,-23],ah:[-8,-21],ge:[6,-24],gh:[10,-27]},
+stride:{h:[2,-14],s:[1,-26],d:[2,-33],fk:[10,-9],ff:[15,0],bk:[-3,-7],bf:[-8,0],ae:[-6,-31],ah:[-10,-35],ge:[9,-26],gh:[13,-28]},
+cock:{h:[4,-13],s:[3,-25],d:[3,-33],fk:[10,-7],ff:[15,0],bk:[-2,-7],bf:[-7,0],ae:[0,-32],ah:[-3,-39],ge:[8,-24],gh:[6,-21]},
+rel:{h:[6,-13],s:[9,-24],d:[12,-29],fk:[11,-7],ff:[15,0],bk:[-1,-9],bf:[-6,-5],ae:[13,-33],ah:[18,-35],ge:[3,-21],gh:[0,-19]},
+fol:{h:[6,-12],s:[11,-19],d:[15,-23],fk:[11,-7],ff:[15,0],bk:[0,-10],bf:[-4,-12],ae:[15,-14],ah:[12,-8],ge:[2,-20],gh:[-2,-22]}};
+const BS={stance:{h:[0,-14],s:[0,-26],d:[1,-33],fk:[4,-7],ff:[7,0],bk:[-4,-7],bf:[-7,0],ae:[-3,-26],ah:[-1,-30],ge:[-1,-27],gh:[-2,-31],bat:[-8,-48]},
+load:{h:[-2,-14],s:[-3,-26],d:[-2,-33],fk:[3,-8],ff:[5,-3],bk:[-5,-7],bf:[-8,0],ae:[-6,-26],ah:[-6,-31],ge:[-4,-27],gh:[-5,-32],bat:[-13,-46]},
+plant:{h:[0,-13],s:[0,-25],d:[1,-32],fk:[7,-8],ff:[11,0],bk:[-4,-7],bf:[-8,0],ae:[-4,-26],ah:[-4,-30],ge:[-3,-27],gh:[-3,-31],bat:[-12,-44]},
+hit:{h:[1,-13],s:[3,-25],d:[4,-32],fk:[8,-7],ff:[11,0],bk:[-3,-6],bf:[-6,0],ae:[8,-24],ah:[13,-25],ge:[7,-25],gh:[12,-26],bat:[27,-27]},
+ext:{h:[2,-13],s:[4,-25],d:[5,-32],fk:[8,-7],ff:[11,0],bk:[-2,-6],bf:[-5,-1],ae:[10,-27],ah:[14,-30],ge:[9,-28],gh:[13,-31],bat:[22,-44]},
+fol:{h:[2,-13],s:[3,-25],d:[3,-32],fk:[8,-7],ff:[11,0],bk:[-2,-6],bf:[-4,-2],ae:[1,-31],ah:[-2,-34],ge:[0,-32],gh:[-3,-35],bat:[-10,-26]}};
+const CP={h:[0,-8],s:[1,-16],d:[2,-22],fk:[6,-9],ff:[5,0],bk:[-4,-9],bf:[-5,0],ae:[7,-12],ah:[10,-13],ge:[6,-13],gh:[9,-15]};
+const Q={pitch:[[PS.set,80],[PS.lift,160],[PS.stride,140],[PS.cock,120],[PS.rel,100],[PS.fol,1e9]],load:[[BS.load,1e9]],swing:[[BS.plant,100],[BS.hit,70],[BS.ext,90],[BS.fol,1e9]]};
+const PB={set:{h:[0,-14],s:[0,-26],sw:6,hw:4,d:[0,-33],lk:[-3,-7],lf:[-4,0],rk:[3,-7],rf:[4,0],le:[-6,-21],lh:[-2,-23],re:[6,-21],rh:[2,-23]},
+lift:{h:[0,-14],s:[0,-26],sw:6,hw:4,d:[0,-33],lk:[-4,-17],lf:[-4,-9],rk:[3,-7],rf:[4,0],le:[-8,-25],lh:[-6,-30],re:[8,-22],rh:[9,-17]},
+stride:{h:[0,-13],s:[0,-26],sw:8,hw:4,d:[0,-33],lk:[-5,-9],lf:[-7,-3],rk:[4,-6],rf:[6,0],le:[-12,-27],lh:[-18,-28],re:[12,-27],rh:[18,-26]},
+cock:{h:[0,-13],s:[0,-26],sw:7,hw:4,d:[0,-32],lk:[-5,-8],lf:[-7,-2],rk:[4,-6],rf:[6,0],le:[-8,-25],lh:[-4,-30],re:[12,-31],rh:[12,-40]},
+rel:{h:[0,-12],s:[1,-23],sw:7,hw:4,d:[1,-30],lk:[-5,-8],lf:[-7,-2],rk:[4,-10],rf:[5,-5],le:[-8,-20],lh:[-5,-17],re:[6,-33],rh:[3,-41]},
+fol:{h:[0,-12],s:[1,-20],sw:6,hw:4,d:[1,-27],lk:[-5,-8],lf:[-7,-2],rk:[5,-13],rf:[6,-10],le:[-9,-21],lh:[-12,-17],re:[2,-22],rh:[-7,-17]}};
+const BB={stance:{h:[0,-14],s:[0,-26],sw:5,hw:4,d:[0,-33],lk:[-4,-7],lf:[-6,0],rk:[4,-7],rf:[6,0],le:[3,-26],lh:[6,-31],re:[8,-27],rh:[7,-31],bat:[10,-50]},
+load:{h:[1,-14],s:[1,-26],sw:5,hw:4,d:[1,-33],lk:[-3,-9],lf:[-4,-3],rk:[5,-7],rf:[7,0],le:[6,-27],lh:[10,-33],re:[11,-28],rh:[10,-32],bat:[16,-47]},
+plant:{h:[0,-13],s:[1,-25],sw:6,hw:4,d:[1,-32],lk:[-6,-8],lf:[-9,-1],rk:[4,-7],rf:[6,0],le:[6,-27],lh:[10,-32],re:[11,-28],rh:[10,-31],bat:[15,-46]},
+hit:{h:[0,-13],s:[-1,-25],sw:7,hw:5,d:[-1,-32],lk:[-6,-8],lf:[-9,0],rk:[3,-6],rf:[5,-1],le:[-2,-27],lh:[-10,-26],re:[2,-27],rh:[-9,-27],bat:[-26,-27]},
+ext:{h:[0,-13],s:[-2,-25],sw:7,hw:5,d:[-2,-32],lk:[-6,-8],lf:[-9,0],rk:[3,-6],rf:[5,-1],le:[-5,-30],lh:[-9,-33],re:[-3,-31],rh:[-8,-34],bat:[-20,-46]},
+fol:{h:[0,-13],s:[-2,-25],sw:6,hw:5,d:[-2,-32],lk:[-6,-8],lf:[-9,0],rk:[3,-6],rf:[5,-1],le:[-6,-32],lh:[-6,-37],re:[-4,-33],rh:[-5,-38],bat:[2,-52]}};
+Q.pitchB=[[PB.set,80],[PB.lift,160],[PB.stride,140],[PB.cock,120],[PB.rel,100],[PB.fol,1e9]];Q.loadB=[[BB.load,1e9]];Q.swingB=[[BB.plant,100],[BB.hit,70],[BB.ext,90],[BB.fol,1e9]];
+function drawBK(P,x,y,s,K,fl){const f=fl?-1:1,X=v=>Math.round(x+f*v*s),Y=v=>Math.round(y+v*s),w=Math.max(2,Math.round(2.6*s)),sw=P.sw,hw=P.hw;
+ const seg=(a,b,t,c)=>{ln(X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),t+2,O);ln(X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),t,c)};
+ const shoe=p=>{const W=Math.max(4,Math.round(5*s)),H=Math.max(2,Math.round(2.2*s));cx.fillStyle=O;cx.fillRect(X(p[0])-(W>>1)-1,Y(p[1])-H,W+2,H+1);cx.fillStyle='#3a3a4a';cx.fillRect(X(p[0])-(W>>1),Y(p[1])-H+1,W,H-1)};
+ const hand=(p,g)=>{const q=Math.max(2,Math.round((g?3.4:2)*s));cx.fillStyle=O;cx.fillRect(X(p[0])-(q>>1)-1,Y(p[1])-(q>>1)-1,q+2,q+2);cx.fillStyle=g?'#8a5a3a':K.sk;cx.fillRect(X(p[0])-(q>>1),Y(p[1])-(q>>1),q,q)};
+ seg(P.h,P.lk,w+1,K.p);seg(P.lk,P.lf,w+1,K.p);shoe(P.lf);seg(P.h,P.rk,w+1,K.p);seg(P.rk,P.rf,w+1,K.p);shoe(P.rf);
+ const y0=Y(P.s[1]),y1=Y(P.h[1])+1,n=Math.max(1,y1-y0);
+ for(const[pad,col]of[[1,O],[0,K.j]])for(let j=y0;j<=y1;j++){const t=(j-y0)/n,mx=X(P.s[0]+(P.h[0]-P.s[0])*t),hf=Math.round((sw+(hw-sw)*t)*s)+pad;cx.fillStyle=col;cx.fillRect(mx-hf,j,hf*2,1)}
+ cx.fillStyle='#222';cx.fillRect(X(P.h[0])-Math.round(hw*s),Y(P.h[1])-1,Math.round(hw*2*s),Math.max(1,Math.round(s)));
+ cx.fillStyle=K.num||'#fff';cx.fillRect(X((P.s[0]+P.h[0])/2)-1,Y((P.s[1]+P.h[1])/2)-Math.round(s*2),Math.max(2,Math.round(2*s)),Math.max(3,Math.round(3.6*s)));
+ const hx=X(P.d[0]),hy=Y(P.d[1]),r=Math.max(3,Math.round(4.4*s));disc(hx,hy,r+1,O);disc(hx,hy,r,K.sk);
+ cx.fillStyle=K.c;for(let j=-r;j<=Math.round(r*.35);j++)for(let i=-r;i<=r;i++)if(i*i+j*j<=r*r+r*.6)cx.fillRect(hx+i,hy+j,1,1);
+ cx.fillStyle=K.sk;cx.fillRect(hx-r-1,hy+1,1,Math.max(1,Math.round(s*1.5)));cx.fillRect(hx+r,hy+1,1,Math.max(1,Math.round(s*1.5)));
+ if(P.bat){const a=[(P.lh[0]+P.rh[0])/2,(P.lh[1]+P.rh[1])/2];seg(a,P.bat,Math.max(2,Math.round(1.4*s)),'#d6a35f')}
+ const sl=[P.s[0]-sw+1,P.s[1]+1],sr=[P.s[0]+sw-1,P.s[1]+1];seg(sl,P.le,w,K.j);seg(P.le,P.lh,w,K.j);hand(P.lh,K.g);seg(sr,P.re,w,K.j);seg(P.re,P.rh,w,K.j);hand(P.rh,0)}
+const play=(w,n)=>{PXS[w=='p'?'pa':'ba']=n=='idle'?null:{q:Q[n],t0:performance.now()}};
+const pose=(a,d)=>{if(!a)return d;let t=performance.now()-a.t0;for(const[p,ms]of a.q){if(t<ms)return p;t-=ms}return a.q[a.q.length-1][0]};
+function ln(a,b,c,d,t,col){cx.fillStyle=col;const dx=Math.abs(c-a),dy=Math.abs(d-b),sx=a<c?1:-1,sy=b<d?1:-1,h=t>>1;let e=dx-dy;for(;;){cx.fillRect(a-h,b-h,t,t);if(a==c&&b==d)break;const e2=2*e;if(e2>-dy){e-=dy;a+=sx}if(e2<dx){e+=dx;b+=sy}}}
+function disc(x,y,r,col){cx.fillStyle=col;for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++)if(i*i+j*j<=r*r+r*.6)cx.fillRect(x+i,y+j,1,1)}
+function drawC(P,x,y,s,K,fl){const f=fl?-1:1,X=v=>Math.round(x+f*v*s),Y=v=>Math.round(y+v*s),w=Math.max(2,Math.round(2.4*s));
+ const seg=(a,b,t,c)=>{ln(X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),t+2,O);ln(X(a[0]),Y(a[1]),X(b[0]),Y(b[1]),t,c)};
+ const shoe=p=>{const W=Math.max(3,Math.round(4*s)),H=Math.max(2,Math.round(2*s)),fx=X(p[0]);cx.fillStyle=O;cx.fillRect(f>0?fx-1:fx-W,Y(p[1])-H,W+1,H+1);cx.fillStyle='#3a3a4a';cx.fillRect(f>0?fx:fx-W+1,Y(p[1])-H+1,W-1,H-1)};
+ const hand=(p,g)=>{const q=Math.max(2,Math.round((g?3.4:2)*s));cx.fillStyle=O;cx.fillRect(X(p[0])-(q>>1)-1,Y(p[1])-(q>>1)-1,q+2,q+2);cx.fillStyle=g?'#8a5a3a':K.sk;cx.fillRect(X(p[0])-(q>>1),Y(p[1])-(q>>1),q,q)};
+ seg(P.h,P.bk,w+1,K.p);seg(P.bk,P.bf,w+1,K.p);shoe(P.bf);
+ seg(P.s,P.ge,w,K.j);seg(P.ge,P.gh,w,K.j);hand(P.gh,K.g);
+ seg(P.h,P.s,Math.round(5.5*s),K.j);
+ seg(P.h,P.fk,w+1,K.p);seg(P.fk,P.ff,w+1,K.p);shoe(P.ff);
+ const hx=X(P.d[0]),hy=Y(P.d[1]),r=Math.max(3,Math.round(4.2*s));disc(hx,hy,r+1,O);disc(hx,hy,r,K.sk);
+ cx.fillStyle=K.c;for(let j=-r;j<0;j++)for(let i=-r;i<=r;i++)if(i*i+j*j<=r*r+r*.6)cx.fillRect(hx+i,hy+j,1,1);
+ cx.fillStyle=O;cx.fillRect(f>0?hx+r-1:hx-r-Math.round(r*.8),hy-2,Math.round(r*.8)+2,2);cx.fillStyle=K.c;cx.fillRect(f>0?hx+r:hx-r-Math.round(r*.8)+1,hy-2,Math.round(r*.8)+1,1);
+ cx.fillStyle=O;cx.fillRect(hx+f*Math.round(r*.5)-(f<0?1:0),hy+1,1,Math.max(1,Math.round(s)));
+ if(P.bat){const a=[(P.ah[0]+P.gh[0])/2,(P.ah[1]+P.gh[1])/2];seg(a,P.bat,Math.max(2,Math.round(1.4*s)),'#d6a35f')}
+ seg(P.s,P.ae,w,K.j);seg(P.ae,P.ah,w,K.j);hand(P.ah,0)}
+const HM=[[79,.55],[0,.15]];
+function mkBg(m){const c=document.createElement('canvas');c.width=160;c.height=113;const g=c.getContext('2d'),R2=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
+ R2(0,0,160,37,'#232d55');const CL=['#e8b27a','#cf7f68','#8c6bb1','#e6d26a','#5f87c9'];for(let y=2;y<34;y+=3)for(let x=(y%2)*2;x<160;x+=3)R2(x,y,2,2,CL[(x*7+y*13)%5]);
+ R2(0,34,160,4,'#14532d');R2(0,34,160,1,'#9ae6b4');for(let y=38,i=0;y<113;y+=8,i++)R2(0,y,160,8,i%2?'#43903a':'#4c9a3c');
+ const dirt=(cxx,cyy,rx,ry,col)=>{g.fillStyle=col;for(let y=-ry;y<=ry;y++)for(let x=-rx;x<=rx;x++)if((x*x)/(rx*rx)+(y*y)/(ry*ry)<=1)g.fillRect(cxx+x,cyy+y,1,1)};
+ const pl=(x,y)=>{R2(x-6,y,13,3,'#fff');R2(x-4,y+3,9,1,'#fff');R2(x-2,y+4,5,1,'#fff');R2(x,y+5,1,1,'#fff')};
+ if(m=='p'){dirt(80,84,76,23,'#a8754a');dirt(80,84,62,17,'#c79a6b');g.fillStyle='#e9e9e9';for(let i=0;i<=47;i++){g.fillRect(80-Math.round(i*80/47),84-i,1,1);g.fillRect(80+Math.round(i*80/47),84-i,1,1)}
+  g.strokeStyle='#f4f4f4';g.lineWidth=1;g.strokeRect(58.5,74.5,12,18);g.strokeRect(90.5,74.5,12,18);pl(80,82)}
+ else{g.fillStyle='#b9855a';for(let y=40;y<113;y++){const hw=Math.round(16+(y-40)*1.5);g.fillRect(80-hw,y,hw*2,1)}g.fillStyle='#c79a6b';for(let y=40;y<113;y++){const hw=Math.round(8+(y-40)*.9);g.fillRect(80-hw,y,hw*2,1)}
+  dirt(80,43,11,3,'#d4a373');g.fillStyle='#e9e9e9';for(let i=0;i<=40;i++){g.fillRect(80-Math.round(i*70/40),40-Math.round(i*.07),1,1);g.fillRect(80+Math.round(i*70/40),40-Math.round(i*.07),1,1)}
+  g.strokeStyle='#f4f4f4';g.strokeRect(44.5,82.5,20,29);g.strokeRect(96.5,82.5,20,29);pl(80,104)}
+ return c}
+function zbox(x0,y0,x1,y1,grid){cx.fillStyle='#fff';for(let x=x0;x<=x1;x+=2){cx.fillRect(x,y0,1,1);cx.fillRect(x,y1,1,1)}for(let y=y0;y<=y1;y+=2){cx.fillRect(x0,y,1,1);cx.fillRect(x1,y,1,1)}
+ if(grid){cx.globalAlpha=.35;const w=(x1-x0)/3,h=(y1-y0)/3;for(let i=1;i<3;i++){cx.fillRect(Math.round(x0+w*i),y0,1,y1-y0);cx.fillRect(x0,Math.round(y0+h*i),x1-x0,1)}cx.globalAlpha=1}}
+function pxDraw(){const pm=PXS.m=='p',pp=pose(PXS.pa,pm?PB.set:PS.set),bp=pose(PXS.ba,pm?BS.stance:BB.stance);cx.drawImage(PXS.bg,0,0);
+ if(PXS.m=='p'){drawC(PS.set,91,76,.85,UMP,1);drawC(CP,80,84,.9,CATC,1);const m=PXS.mt||[80,63];disc(Math.round(m[0]),Math.round(m[1]),3,O);disc(Math.round(m[0]),Math.round(m[1]),2,'#8a5a3a');
+  drawC(bp,PXS.fl?110:50,79,1,BATC,PXS.fl);drawBK(pp,34,110,1.8,PIT,0);if(PXS.kc){ln(88,58,94,46,3,O);ln(88,58,94,46,1,UMP.j)}zbox(70,52,90,73)}
+ else{drawC(pp,80,47,.45,PIT,0);drawC(PS.set,92,113,.95,UMP,1);drawC(CP,74,113,1,CATC,1);drawBK(bp,PXS.fl?116:44,100,1.45,BATC,!PXS.fl);zbox(68,62,92,90,1)}
+ if(PXS.fb){const b=PXS.fb,p=Math.min(1,(performance.now()-b.t0)/b.dur),x=b.x0+(b.x1-b.x0)*p,y=b.y0+(b.y1-b.y0)*p;cx.fillStyle=O;cx.fillRect(Math.round(x)-2,Math.round(y)-2,5,5);cx.fillStyle='#fff';cx.fillRect(Math.round(x)-1,Math.round(y)-1,3,3)}
+ if(PXS.ball){const[x,y,p]=PXS.ball,r=Math.max(1,Math.round(1+p*3));cx.fillStyle=O;cx.fillRect(Math.round(x)-r-1,Math.round(y)-r-1,2*r+2,2*r+2);cx.fillStyle='#fff';cx.fillRect(Math.round(x)-r,Math.round(y)-r,2*r,2*r)}}
+function pxInit(m){PXS.m=m;PXS.fl=m=='b'?S.hand=='L':0;PXS.kc=0;PXS.mt=PXS.ball=PXS.fb=PXS.pa=PXS.ba=null;const c=$('#cv');cx=c.getContext('2d');cx.imageSmoothingEnabled=false;PXS.bg=mkBg(m);(function f(){if(!document.body.contains(c))return;pxDraw();requestAnimationFrame(f)})()}
+const CVS='<canvas id=cv width=160 height=113 style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated"></canvas>';
+const scene=()=>`<div id=bx>${CVS}<div id=sz style="border:none"></div></div>`;
+const bscene=()=>`<div id=fd>${CVS}<svg id=dm viewBox="0 0 120 100" style="display:none;position:absolute;right:4px;top:4px;width:30%;pointer-events:none;background:#0007;border-radius:8px"></svg></div>`;
+function pit(){newG2();const d=diff(),bq=.3+d*.7,sa=S.lvl>=2||!pro(),mx=sa?50+S.sta*.7:15+S.sta*.35,mu=S.inj==1?.88:1,ks=S.keys.filter(k=>PP[k]),op=()=>c2(.24+(d-.5)*.12,.17,.34),my=()=>c2(.24+(ovr()/100-d)*.15,.15,.38),lim=R(1,2)*3;
+ let lh=0,pc=0,to=0,run=0,K=0,hh=0,bl=0,kk=0,last='',rep=0,lock=0,sel='ff',t0=performance.now(),px=0,py=0,pulled=0,fin2=0,st,r0,o0;const ph=[rn()*6,rn()*6],sx=Math.max(1.2,3-S.ctl*mu*.012)+d*.8,i0=sa?1:R(7,8);
+ for(let i=1;i<i0;i++){G.inn=i;G.op+=half(ST(),op());G.my+=half(ST(),my())}G.inn=i0;st=ST();
+ show(`<div class=card><div class=g2 id=pb>${ks.map(k=>`<button data-k=${k} class="${k=='ff'?'sel':''}" ${A(()=>{sel=k;document.querySelectorAll('#pb button').forEach(b=>b.classList.toggle('sel',b.dataset.k==k))})}>${PN[k]} ${S[k]}</button>`).join('')}</div></div><div class=card>${scene()}<div id=msg>點擊你要投的位置(點下去就是最終位置)</div><small id=sc></small></div>`);
+ const msg=t=>$('#msg').innerHTML=t,hand=()=>{lh=rn()<.3;PXS.fl=lh},info=()=>$('#sc').innerHTML=`${lh?'左':'右'}打者・第${G.inn}局・對手 ${G.op} : ${G.my} 我方・${st.o}出局・壘上${bs(st)}・${K}好${bl}壞・球數 ${pc}/${Math.round(mx)}`;pxInit('p');hand();info();
+ function loop(){}
+ function over(){fin2=1;document.onkeydown=null;const tw=G.my>G.op?1:G.my<G.op?-1:0;fin(c2((to/3-run*1.2+kk*.15)/(sa?6:2.5),0,1),{outs:to,k:kk,runs:run,pc,win:sa&&to>=15&&tw>0,tw},pulled?(sa?'教練把你換下。':'後援任務結束。'):'你完投到比賽結束!')}
+ function after(){if(!(G.inn>=9&&G.my>G.op))G.my+=half(ST(),my());if(G.inn>=9)return over();G.inn++;
+  if(pulled){for(;G.inn<=9;G.inn++){G.op+=half(ST(),.27);if(G.inn>=9&&G.my>G.op)break;G.my+=half(ST(),my())}return over()}st=ST();setTimeout(nx,1200)}
+ function pa2(){pulled=pulled||(sa?(pc>=mx||run>=6||(run>=4&&pc>mx*.7)):(to>=lim||run>=3||pc>=mx));if(pulled){while(st.o<3)apply(st,apc(.27));G.op+=st.r;return after()}if(st.o>=3){G.op+=st.r;return after()}nx()}
+ function nx(){lock=0;PXS.kc=0;PXS.mt=null;PXS.fb=null;play('p','idle');play('b','idle');hand();t0=performance.now();info();msg('下一位打者');loop()}
+ function go(e){if(lock||fin2||!e)return;lock=1;pc++;r0=st.r;o0=st.o;const z=$('#sz').getBoundingClientRect(),bb=$('#bx').getBoundingClientRect(),tx=c2((e.clientX-z.left-z.width/2)/(z.width/2)*.75,-1.5,1.5),ty=c2((e.clientY-z.top-z.height/2)/(z.height/2)*.75,-1.5,1.5),f=pc/mx,mp=c2((100-S.ctl*mu)/100*.5+f*.3-.1,0,.6),mis=rn()<mp,x=tx,y=ty,edge=Math.max(Math.abs(x),Math.abs(y)),t=S[sel]*mu*(1-f*.15),v=Math.round(vel(sel,t)*(1-f*.03)),sf=sel=='ff'?c2((v-130)/30,0,1):c2(t/100,0,1),sc=480/bb.width,fx=(z.left-bb.left+z.width/2+x/.75*z.width/2)*sc,fy=(z.top-bb.top+z.height/2+y/.75*z.height/2)*sc;
+  rep=last==sel?rep+1:0;last=sel;const rp=Math.min(.2,rep*.05)+(mis?.15:0);let m,res='',sw2=0;
+  if(edge>.75){if(rn()<.2+(K==2?.15:0)){sw2=1;if(rn()<.25){if(K<2)K++;m='壞球被擦成界外'}else{K++;m='壞球誘出揮空!'}}else{bl++;m='壞球'}}
+  else if(rn()>.68){K++;m='好球(站著不動)'}
+  else if(rn()>c2(.9-sf*.38-edge*.22+(bq-.6)*.3+rp,.2,.92)){sw2=1;K++;m='揮空!'}
+  else if(rn()<.35){sw2=1;if(K<2)K++;m='界外'}
+  else{sw2=1;const c=1-edge/.75;if(rn()<c2(.2+c*.22+(bq-.5)*.25-sf*.1+rp,.05,.55)){hh++;if(rn()<c2(.08+c*.12+(bq-.5)*.2,.02,.4)){res='4';m='被轟出全壘打!'}else{res=rn()<.25?'2':'1';m=res=='2'?'被打出二壘安打':'被打出安打'}}else{res='O';m='製造出局'}}
+  if(K>=3){res='K';kk++;m='三振!'}else if(bl>=4){res='W';m='保送'}
+  if(res){apply(st,res);run+=st.r-r0;to+=st.o-o0;K=bl=0;m+=st.r>r0?`・失 ${st.r-r0} 分`:''}
+  play('b','load');play('p','pitchB');setTimeout(()=>{PXS.fb={x0:40,y0:38,x1:fx/3,y1:fy/3,t0:performance.now(),dur:330};setTimeout(()=>{PXS.mt=[fx/3,fy/3]},320);if(sw2)setTimeout(()=>play('b','swing'),60)},500);
+  setTimeout(()=>{if(!sw2&&/好球|三振/.test(m))PXS.kc=1;msg(`${PN[sel]} ${v}km/h・${m}${mis?'(控球失準,球路偏軟)':''}`);info()},1000);
+  if(res)return setTimeout(pa2,2100);setTimeout(nx,1800)}
+ $('#bx').onpointerdown=go}
+
+function fin(r,x,note){document.onkeydown=null;let s,g1;
+ if(S.role=='B'){const hr=Math.round(S.pow/100*r*12*(1+S.lvl*.7))+x.hr,h=Math.round(S.con*r*.8*(1+S.lvl*.5))+x.h;S.c.hr+=hr;S.c.h+=h;s=`本季 ${h} 安打、${hr} 轟`;g1=`今天:${x.pa} 打席 ${x.h} 安打 ${x.hr} 轟`}
+ else{const w=Math.round(r*10*(.5+S.lvl*.35)),k=Math.round(S.ff*r*1.5*(.5+S.lvl*.3))+x.k;S.c.w+=w+(x.win?1:0);S.c.k+=k;s=`本季 ${w} 勝、${k} 三振`;g1=`今天:${Math.floor(x.outs/3)}.${x.outs%3} 局 失${x.runs}分 ${x.k}K ${x.pc}球${x.win?'・勝投':''}`}
+ const gain=Math.round(1+r*12)+(S.age<24?2:0);S.pts+=gain;
+ const g=fx({fame:Math.round(r*(6+(pro()?8:0)+S.lvl*4))+(x.tw>0?2:0),money:pro()?200+S.lvl*300+Math.round(r*100):0});
+ let inj='';if(rn()<.05+(100-S.sta)/900+(S.role=='P'&&x.pc>100?.05:0)){inj='<br>⚠️ 賽後傷勢:'+injure().replace(/(今年表現打折)/,'下季前可痊癒')}
+ if(S.out==0)S.inj=0;S.age++;S.yrs++;ageP();
+ if(pro()){const o=ovr();S.lvl=(o>=74&&S.fame>=60)?3:(o>=62&&S.fame>=25)?2:o>=48?1:0}
+ const t=r>.8?'全場最佳!':r>.5?'穩定的好表現。':r>.25?'表現平平。':'艱難的一天。';
+ show(hud()+`<div class=card><h2>賽季結算</h2>${t} ${note||''}<br>${g1}<br>比賽:對手 ${G.op} : ${G.my} 我方(${x.tw>0?'勝':x.tw<0?'敗':'和局'})<br>${s}<br><small>${g}・天賦點 +${gain}${inj}</small></div><button class=p ${A(nxt)}>分配天賦點(${S.age}歲)</button>`+(S.age>=34?`<button ${A(end)}>在這裡退休</button>`:''))}
+function end(){const f=S.fame,ti=f>=150?'🏆 傳奇・名人堂':f>=90?'⭐ 一代名將':f>=40?'👍 穩定的職業球員':'🌱 平凡但熱愛棒球的人';
+ show(`<div class=card><h2>退休・${S.age}歲</h2><b>${ti}</b><br>${S.name}的 ${S.yrs} 年棒球人生<br><br>名聲 ${f}・資產 ${S.money}萬<br>生涯 ${S.role=='B'?`${S.c.h} 安打、${S.c.hr} 全壘打`:`${S.c.w} 勝、${S.c.k} 三振`}<br>最高層級:${LV[S.lvl]}</div><button class=p ${A(start)}>再活一次</button>`)}
+start();
+</script></body></html>
